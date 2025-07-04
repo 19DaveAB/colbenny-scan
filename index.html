@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colbenny - Food Scanner</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+              <img src="https://i.postimg.cc/cCgNYDYf/B91-F2-B70-ED61-4367-9604-71-D690-A78043.png" > 
+            </div>
+            <h1>Colbenny</h1>
+            <p class="tagline">Smart Food Scanner & Health Analyzer</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline" id="login-btn">
+                <i class="fas fa-user"></i>
+                Login
+            </button>
+            <button class="btn btn-outline" id="register-btn">
+                <i class="fas fa-user-plus"></i>
+                Register
+            </button>
+            <div class="user-profile" id="user-profile" style="display: none;">
+                <img src="https:i.postimg.cc/FztNvc7X/E92-D9370-6567-40-BE-B5-EF-CF35-E4-C67-DE4.png" class="profile-avatar" id="profile-avatar">
+                <span class="profile-name" id="profile-name"></span>
+                <div class="profile-dropdown">
+                    <button id="profile-settings"><i class="fas fa-cog"></i> Settings</button>
+                    <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="scan">
+                <i class="fas fa-camera"></i>
+                Scan Food
+            </button>
+            <button class="tab-btn" data-tab="search">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <i class="fas fa-history"></i>
+                History
+            </button>
+            <button class="tab-btn" data-tab="calories">
+                <i class="fas fa-fire"></i>
+                Calories
+            </button>
+            <button class="tab-btn" data-tab="profile">
+                <i class="fas fa-user-circle"></i>
+                Profile
+            </button>
+        </nav>
+
+        <!-- Scan Tab -->
+        <section class="tab-content active" id="scan-tab">
+            <div class="food-inspiration">
+                <h3>Scan & Discover Nutrition</h3>
+                <div class="inspiration-gallery">
+                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=150&h=100&fit=crop&crop=center" alt="Healthy salad" class="inspiration-image">
+                    <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=150&h=100&fit=crop&crop=center" alt="Fresh smoothie" class="inspiration-image">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=150&h=100&fit=crop&crop=center" alt="Nutritious meal" class="inspiration-image">
+                    <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=150&h=100&fit=crop&crop=center" alt="Fresh vegetables" class="inspiration-image">
+                </div>
+            </div>
+            
+            <div class="camera-container">
+                <video id="camera-feed" autoplay playsinline></video>
+                <canvas id="capture-canvas" style="display: none;"></canvas>
+                <div class="camera-overlay">
+                    <div class="scan-frame"></div>
+                    <p class="scan-instruction">Position food item within the frame</p>
+                </div>
+                <div class="camera-controls">
+                    <button id="start-camera" class="btn btn-primary">
+                        <i class="fas fa-camera"></i>
+                        Start Camera
+                    </button>
+                    <button id="capture-photo" class="btn btn-success" style="display: none;">
+                        <i class="fas fa-camera-retro"></i>
+                        Capture
+                    </button>
+                    <button id="stop-camera" class="btn btn-secondary" style="display: none;">
+                        <i class="fas fa-stop"></i>
+                        Stop
+                    </button>
+                </div>
+            </div>
+            
+            <!-- File Upload Alternative -->
+            <div class="upload-section">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-visual">
+                        <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=100&h=100&fit=crop&crop=center" alt="Fresh vegetables" class="upload-sample-image">
+                        <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=100&h=100&fit=crop&crop=center" alt="Fresh fruits" class="upload-sample-image">
+                        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop&crop=center" alt="Healthy meal" class="upload-sample-image">
+                    </div>
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop your food image here or browse</p>
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    <button class="btn btn-outline" onclick="document.getElementById('file-input').click()">
+                        Choose File
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Tab -->
+        <section class="tab-content" id="search-tab">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search for food items..." class="search-input">
+                    <button id="search-btn" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+                <div class="search-suggestions" id="search-suggestions"></div>
+            </div>
+        </section>
+
+        <!-- History Tab -->
+        <section class="tab-content" id="history-tab">
+            <div class="history-container">
+                <div class="history-header">
+                    <h2>Scan History</h2>
+                    <button id="clear-history" class="btn btn-outline">
+                        <i class="fas fa-trash"></i>
+                        Clear All
+                    </button>
+                </div>
+                <div id="history-list" class="history-list">
+                    <!-- History items will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Calories Tab -->
+        <section class="tab-content" id="calories-tab">
+            <div class="calories-container">
+                <!-- Daily Overview -->
+                <div class="calories-overview">
+                    <div class="daily-summary">
+                        <h2>Today's Calorie Intake</h2>
+                        <div class="calorie-circle">
+                            <div class="circle-progress" id="calorie-progress">
+                                <div class="circle-inner">
+                                    <span class="calories-consumed" id="calories-consumed">0</span>
+                                    <span class="calories-goal">/ <span id="calories-goal">2000</span> cal</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="quick-stats">
+                            <div class="stat-box">
+                                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=50&h=50&fit=crop&crop=center" alt="Protein" class="stat-icon">
+                                <span class="stat-label">Protein</span>
+                                <span class="stat-value" id="protein-consumed">0g</span>
+                            </div>
+                            <div class="stat-box">
+                                <img src="https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=50&h=50&fit=crop&crop=center" alt="Carbs" class="stat-icon">
+                                <span class="stat-label">Carbs</span>
+                                <span class="stat-value" id="carbs-consumed">0g</span>
+                            </div>
+                            <div class="stat-box">
+                                <img src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=50&h=50&fit=crop&crop=center" alt="Fat" class="stat-icon">
+                                <span class="stat-label">Fat</span>
+                                <span class="stat-value" id="fat-consumed">0g</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Add Section -->
+                <div class="quick-add-section">
+                    <h3>Quick Calorie Checker</h3>
+                    <div class="calorie-search">
+                        <input type="text" id="calorie-search-input" placeholder="Search food items (e.g., apple, banana, chicken breast)">
+                        <button class="btn btn-primary" id="calorie-search-btn">
+                            <i class="fas fa-search"></i>
+                            Check Calories
+                        </button>
+                    </div>
+                    <div class="calorie-results" id="calorie-results"></div>
+                </div>
+
+                <!-- Popular Foods Gallery -->
+                <div class="popular-foods-section">
+                    <h3>Popular Foods & Their Calories</h3>
+                    <div class="foods-grid">
+                        <div class="food-card" data-food="apple" data-calories="95">
+                            <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=120&h=120&fit=crop&crop=center" alt="Apple" class="food-image">
+                            <h4>Apple</h4>
+                            <p>95 calories</p>
+                            <button class="btn btn-outline add-food-btn">Add to Daily</button>
+                        </div>
+                        <div class="food-card" data-food="banana" data-calories="105">
+                            <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=120&h=120&fit=crop&crop=center" alt="Banana" class="food-image">
+                            <h4>Banana</h4>
+                            <p>105 calories</p>
+                            <button class="btn btn-outline add-food-btn">Add to Daily</button>
+                        </div>
+                        <div class="food-card" data-food="chicken breast" data-calories="165">
+                            <img src="https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=120&h=120&fit=crop&crop=center" alt="Chicken Breast" class="food-image">
+                            <h4>Chicken Breast</h4>
+                            <p>165 calories (100g)</p>
+                            <button class="btn btn-outline add-food-btn">Add to Daily</button>
+                        </div>
+                        <div class="food-card" data-food="rice" data-calories="130">
+                            <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=120&h=120&fit=crop&crop=center" alt="Rice" class="food-image">
+                            <h4>Rice</h4>
+                            <p>130 calories (100g)</p>
+                            <button class="btn btn-outline add-food-btn">Add to Daily</button>
+                        </div>
+                        <div class="food-card" data-food="broccoli" data-calories="34">
+                            <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=120&h=120&fit=crop&crop=center" alt="Broccoli" class="food-image">
+                            <h4>Broccoli</h4>
+                            <p>34 calories (100g)</p>
+                            <button class="btn btn-outline add-food-btn">Add to Daily</button>
+                        </div>
+                        <div class="food-card" data-food="salmon" data-calories="208">
+                            <img src="https://images.unsplash.com/photo-1544943910-4c1dc44aab44?w=120&h=120&fit=crop&crop=center" alt="Salmon" class="food-image">
+                            <h4>Salmon</h4>
+                            <p>208 calories (100g)</p>
+                            <button class="btn btn-outline add-food-btn">Add to Daily</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Food Log -->
+                <div class="food-log-section">
+                    <h3>Today's Food Log</h3>
+                    <div class="meals-container">
+                        <div class="meal-section">
+                            <h4><i class="fas fa-sun"></i> Breakfast</h4>
+                            <div class="meal-items" id="breakfast-items">
+                                <p class="no-items">No items added yet</p>
+                            </div>
+                        </div>
+                        <div class="meal-section">
+                            <h4><i class="fas fa-sun"></i> Lunch</h4>
+                            <div class="meal-items" id="lunch-items">
+                                <p class="no-items">No items added yet</p>
+                            </div>
+                        </div>
+                        <div class="meal-section">
+                            <h4><i class="fas fa-moon"></i> Dinner</h4>
+                            <div class="meal-items" id="dinner-items">
+                                <p class="no-items">No items added yet</p>
+                            </div>
+                        </div>
+                        <div class="meal-section">
+                            <h4><i class="fas fa-cookie"></i> Snacks</h4>
+                            <div class="meal-items" id="snacks-items">
+                                <p class="no-items">No items added yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goal Setting -->
+                <div class="goal-setting-section">
+                    <h3>Calorie Goals & Settings</h3>
+                    <div class="goal-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="daily-calorie-goal">Daily Calorie Goal</label>
+                                <input type="number" id="daily-calorie-goal" value="2000" min="1000" max="5000">
+                            </div>
+                            <div class="form-group">
+                                <label for="activity-level">Activity Level</label>
+                                <select id="activity-level">
+                                    <option value="sedentary">Sedentary</option>
+                                    <option value="light" selected>Lightly Active</option>
+                                    <option value="moderate">Moderately Active</option>
+                                    <option value="very">Very Active</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="update-goals-btn">Update Goals</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Tab -->
+        <section class="tab-content" id="profile-tab">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <div class="profile-avatar-large">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="user-details">
+                            <h2 id="user-display-name">Guest User</h2>
+                            <p id="user-email">Not logged in</p>
+                            <p class="member-since">Member since: <span id="member-date">-</span></p>
+                        </div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-scans">0</div>
+                            <div class="stat-label">Total Scans</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="this-week-scans">0</div>
+                            <div class="stat-label">This Week</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="favorite-foods">0</div>
+                            <div class="stat-label">Favorite Foods</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-content">
+                    <div class="profile-section">
+                        <h3><i class="fas fa-cog"></i> Account Settings</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label for="save-images-toggle">Save Images</label>
+                                <input type="checkbox" id="save-images-toggle" checked>
+                            </div>
+                            <div class="setting-item">
+                                <label for="auto-save-toggle">Auto Save Results</label>
+                                <input type="checkbox" id="auto-save-toggle" checked>
+                            </div>
+                            <div class="setting-item">
+                                <label for="notifications-toggle">Notifications</label>
+                                <input type="checkbox" id="notifications-toggle" checked>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3><i class="fas fa-chart-line"></i> Your Food Journey</h3>
+                        <div class="journey-highlights">
+                            <div class="highlight-card">
+                                <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=60&h=60&fit=crop&crop=center" alt="Fresh fruits" class="highlight-image">
+                                <h4>Top Scanned Food</h4>
+                                <p id="top-food">Start scanning to see your favorites!</p>
+                            </div>
+                            <div class="highlight-card">
+                                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=60&h=60&fit=crop&crop=center" alt="Heart health" class="highlight-image">
+                                <h4>Health Focus</h4>
+                                <p id="health-focus">Discover nutritional insights</p>
+                            </div>
+                            <div class="highlight-card">
+                                <img src="https://images.unsplash.com/photo-1483648969698-5e7dcaa3444f?w=60&h=60&fit=crop&crop=center" alt="Calendar" class="highlight-image">
+                                <h4>Scan Streak</h4>
+                                <p id="scan-streak">0 days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="spinner"></div>
+            <p>Analyzing food item...</p>
+        </div>
+
+        <!-- Results Modal -->
+        <div class="modal" id="results-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="food-name">Food Item</h2>
+                    <button class="close-btn" id="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="food-image-container">
+                        <img id="scanned-image" src="" alt="Scanned food" class="food-image">
+                    </div>
+                    
+                    <div class="info-tabs">
+                        <button class="info-tab active" data-info="ingredients">Ingredients</button>
+                        <button class="info-tab" data-info="benefits">Benefits</button>
+                        <button class="info-tab" data-info="warnings">Warnings</button>
+                        <button class="info-tab" data-info="nutrition">Nutrition</button>
+                    </div>
+
+                    <div class="info-content">
+                        <div class="info-section active" id="ingredients-section">
+                            <h3>Ingredients</h3>
+                            <ul id="ingredients-list"></ul>
+                        </div>
+                        
+                        <div class="info-section" id="benefits-section">
+                            <h3>Health Benefits</h3>
+                            <div id="benefits-list"></div>
+                        </div>
+                        
+                        <div class="info-section" id="warnings-section">
+                            <h3>Health Warnings & Disadvantages</h3>
+                            <div id="warnings-list"></div>
+                        </div>
+                        
+                        <div class="info-section" id="nutrition-section">
+                            <h3>Nutritional Information</h3>
+                            <div id="nutrition-facts"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="save-result">
+                        <i class="fas fa-save"></i>
+                        Save to History
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Modal -->
+        <div class="modal" id="login-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Login to Colbenny</h2>
+                    <button class="close-btn" id="close-login-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-email">Email Address</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </button>
+                    </form>
+                    <p class="auth-switch">Don't have an account? <a href="#" id="switch-to-register">Register here</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Modal -->
+        <div class="modal" id="register-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Create Account</h2>
+                    <button class="close-btn" id="close-register-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label for="register-name">Full Name</label>
+                            <input type="text" id="register-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email Address</label>
+                            <input type="email" id="register-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-confirm-password">Confirm Password</label>
+                            <input type="password" id="register-confirm-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i>
+                            Create Account
+                        </button>
+                    </form>
+                    <p class="auth-switch">Already have an account? <a href="#" id="switch-to-login">Login here</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="error-message">
+            <div class="error-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p id="error-text"></p>
+                <button class="btn btn-secondary" onclick="this.parentElement.parentElement.style.display='none'">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Colbenny</h3>
+                <p>Smart food scanning and health analysis to help you make informed dietary choices.</p>
+                <div class="health-images">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=80&h=80&fit=crop&crop=center" alt="Fresh apples" class="health-image">
+                    <img src="https://images.unsplash.com/photo-1582515073490-39981397c445?w=80&h=80&fit=crop&crop=center" alt="Fresh carrots" class="health-image">
+                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=80&h=80&fit=crop&crop=center" class="health-image">
+                    <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=80&h=80&fit=crop&crop=center" alt="Healthy smoothie" class="health-image">
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Information</h3>
+                <div class="contact-info">
+                    <p><i class="fas fa-envelope"></i> davidabentley18@gmail.com</p>
+                    <p><i class="fas fa-phone"></i> 0541408347</p>
+                    <p><i class="fas fa-info-circle"></i> For support and inquiries</p>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Health & Nutrition</h3>
+                <div class="food-categories">
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=40&h=40&fit=crop&crop=center" alt="Organic vegetables" class="category-image">
+                        <span>Organic Foods</span>
+                    </div>
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1544943910-4c1dc44aab44?w=40&h=40&fit=crop&crop=center" alt="Fresh salmon" class="category-image">
+                        <span>Proteins</span>
+                    </div>
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=40&h=40&fit=crop&crop=center" alt="Whole grains" class="category-image">
+                        <span>Grains</span>
+                    </div>
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=40&h=40&fit=crop&crop=center" alt="Spices and herbs" class="category-image">
+                        <span>Spices</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Colbenny. All rights reserved. | Developed with care for your health journey.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="storage.js"></script>
+    <script src="api.js"></script>
+    <script src="camera.js"></script>
+    <script src="auth.js"></script>
+    <script src="calories.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
