@@ -146,7 +146,13 @@ class CameraManager {
             throw new Error('Failed to capture photo: ' + error.message);
         }
     }
-
+    
+function analyzeImage(image) {
+    console.log("Analyzing image:", image);
+    const foodTypes =["Bread", "Rice", "Apple", "Yam"];
+    return foodTypes[Math.floor(Math.random() * foodTypes.length)];
+}
+    
     showCaptureEffect() {
         // Create flash effect
         const flash = document.createElement('div');
