@@ -3,17 +3,17 @@ class APIClient {
     constructor() {
         // API endpoints and keys
         this.endpoints = {
-            foodAnalysis: 'https://spoonacular.com/food',
-            nutritionData: 'https://fdc.nal.usda.gov/ndb/nutrients',
-            foodSearch: 'https://fdc.nal.usda.gov/food-search?type=Foundation',
-            spoonacular: 'https://spoonacular.com/food'
+            foodAnalysis: 'https://logmeal.com/api/',
+            nutritionData: 'https://logmeal.com/api/',
+            foodSearch: 'https://logmeal.com/api/',
+            spoonacular: 'https://spoonacular.com/food-api'
         };
 
         // Get API keys from environment or use fallbacks
         this.apiKeys = {
-            foodAI: this.getEnvVar('067692799f01441ca56a8de004ee3a6c'),
+            foodAI: this.getEnvVar('8d04b28e6c63af380c99c6303fe80c550097defa'),
             spoonacular: this.getEnvVar('067692799f01441ca56a8de004ee3a6c'),
-            foodData: this.getEnvVar('RNvoxiryeaOvSuauAGa3ar86WQpH0IPh5iLLkACq')
+            foodData: this.getEnvVar('8d04b28e6c63af380c99c6303fe80c550097defa')
         };
 
         // Initialize retry mechanism
