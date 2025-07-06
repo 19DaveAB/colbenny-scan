@@ -13,7 +13,6 @@ class APIClient {
         this.apiKeys = {
             logmeal: this.getEnvVar('8d04b28e6c63af380c99c6303fe80c550097defa'),
             spoonacular: this.getEnvVar('067692799f01441ca56a8de004ee3a6c'),
-            logmeal: this.getEnvVar('8d04b28e6c63af380c99c6303fe80c550097defa')
         };
 
         // Initialize retry mechanism
@@ -117,6 +116,12 @@ class APIClient {
             console.warn('LogMeal API failed:', error);
         }
 
+        try {
+    return await this.analyzeWithLogMeal(imageBlob);
+} catch (error) {
+    console.warn('LogMeal direct API failed:', error);
+}
+        
         return null;
     }
 
@@ -145,7 +150,7 @@ class APIClient {
         return null;
     }
 
-    async analyzeWithFoodAI(imageBlob) {
+    async analyzeWithlogmeal(imageBlob) {
         const formData = new FormData();
         formData.append('image', imageBlob);
 
@@ -153,9 +158,9 @@ class APIClient {
             this.endpoints.foodAnalysis,
             {
                 method: 'POST',
-                body: formData,
+                body: formData,m
                 headers: {
-                    'Authorization': `Bearer ${this.apiKeys.foodAI}`
+                    'Authorization': `Bearer ${this.apiKeys.logmeal}`
                 }
             }
         );
@@ -274,11 +279,18 @@ async analyzeWithLogMeal(imageBlob) {
             { name: 'Tomato', colors: ['255,99,71'], confidence: 0.6 },
             { name: 'Lettuce', colors: ['0,255,0', '50,205,50'], confidence: 0.5 },
             { name: 'Bread', colors: ['245,222,179', '210,180,140'], confidence: 0.4 }
+            { name: 'Rice', colors: ['255,255,255', '245,245,220'], confidence: 0.5 },
+            { name: 'Chicken', colors: ['255,228,196', '222,184,135'], confidence: 0.5 },
+            { name: 'Beef', colors: ['139,69,19'], confidence: 0.5 },
+            { name: 'Carrot', colors: ['255,140,0'], confidence: 0.6 },
+            { name: 'Egg', colors: ['255,255,224', '255,255,240'], confidence: 0.6 }
         ];
 
 
       // Find best match
-let bestMatch = { name: 'Unknown Food', confidence: 0.3 };
+if (bestMatch.confidence < 0.5) {        
+ bestMatch = { name: 'Unknown Food', confidence: bestMatch.confidence};
+}
 
 for (const pattern of foodPatterns) {
     const matchScore = this.calculateColorMatch(colors, pattern.colors);
@@ -672,7 +684,7 @@ return bestMatch;
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
+            hash = ((hash << 5) - hash) + char;a
             hash = hash & hash; // Convert to 32-bit integer
         }
         return hash.toString();
