@@ -3,17 +3,17 @@ class APIClient {
     constructor() {
         // API endpoints and keys
         this.endpoints = {
-            foodAnalysis: 'https://logmeal.com/api/',
-            nutritionData: 'https://logmeal.com/api/',
-            foodSearch: 'https://logmeal.com/api/',
-            spoonacular: 'https://spoonacular.com/food-api'
+            foodAnalysis: 'https://api.logmeal.es/v2/image/foodrecognition',
+            nutritionData: 'https://api.logmeal.es/v2/recognition/dish',
+            foodSearch: 'https://api.logmeal.es/v2/recognition/dish',
+            spoonacular: 'https://api.spoonacular.com'
         };
 
         // Get API keys from environment or use fallbacks
         this.apiKeys = {
-            foodAI: this.getEnvVar('8d04b28e6c63af380c99c6303fe80c550097defa'),
-            spoonacular: this.getEnvVar('067692799f01441ca56a8de004ee3a6c'),
-            foodData: this.getEnvVar('8d04b28e6c63af380c99c6303fe80c550097defa')
+            logmeal: this.getEnvVar('LOGMEAL_API_KEY', '8d04b28e6c63af380c99c6303fe80c550097defa'),
+            spoonacular: this.getEnvVar('SPOONACULAR_API_KEY', '067692799f01441ca56a8de004ee3a6c'),
+            logmeal: this.getEnvVar('LOGMEAL_API_KEY', '8d04b28e6c63af380c99c6303fe80c550097defa')
         };
 
         // Initialize retry mechanism
@@ -110,11 +110,11 @@ class APIClient {
             console.warn('Spoonacular API failed:', error);
         }
 
-        // Try alternative food recognition service
+        // Try LogMeal Food API
         try {
             return await this.analyzeWithFoodAI(imageBlob);
         } catch (error) {
-            console.warn('FoodAI API failed:', error);
+            console.warn('LogMeal API failed:', error);
         }
 
         return null;
@@ -170,7 +170,26 @@ class APIClient {
 
         return null;
     }
+async analyzeWithLogMeal(imageBlob) {
+    const formData = new FormData();
+    formData.append('image', imageBlob);
 
+    const response = await fetch(this.endpoints.logmeal, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${this.apiKeys.logmeal}`
+        },
+        body: formData
+    });
+    const data = await response.json();
+    if (data && data.recognition_results && data.recognition_results.length > 0) {
+        return {
+            foodName: data.recognition_results[0].name,
+            confidence: data.recognition_results[0].confidence
+        };
+    }
+    return null;
+}
     async performClientSideAnalysis(imageData) {
         // Fallback client-side analysis using basic image processing
         try {
@@ -258,21 +277,25 @@ class APIClient {
         ];
 
 
-        // Find best match
-        let bestMatch = { name: 'Unknown Food', confidence: 0.3 };
-        
-        for (const pattern of foodPatterns) {
-            const matchScore = this.calculateColorMatch(colors, pattern.colors);
-            if (matchScore > bestMatch.confidence) {
-                bestMatch = {
-                    name: pattern.name,
-                    confidence: Math.min(matchScore * pattern.confidence, 0.8)
-                };
-            }
-        }
-        
-        return bestMatch;
+      // Find best match
+let bestMatch = { name: 'Unknown Food', confidence: 0.3 };
+
+for (const pattern of foodPatterns) {
+    const matchScore = this.calculateColorMatch(colors, pattern.colors);
+    if (matchScore > bestMatch.confidence) {
+        bestMatch = {
+            name: pattern.name,
+            confidence: Math.min(matchScore * pattern.confidence, 0.8)
+        };
     }
+}
+
+// Only return a food match if confidence is strong enough (e.g., 0.6)
+if (bestMatch.confidence < 0.6) {
+    bestMatch = { name: 'Unknown Food', confidence: bestMatch.confidence };
+}
+
+return bestMatch;
 
     calculateColorMatch(imageColors, patternColors) {
         let maxMatch = 0;
