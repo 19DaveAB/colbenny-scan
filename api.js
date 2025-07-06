@@ -256,7 +256,11 @@ class APIClient {
             { name: 'Lettuce', colors: ['0,255,0', '50,205,50'], confidence: 0.5 },
             { name: 'Bread', colors: ['245,222,179', '210,180,140'], confidence: 0.4 }
         ];
-        
+
+        functions analyzeImage(image) {
+        const index = Math.floor(Math.random() * foodPatterns.length);
+        return foodPatterns[index]; // random result to simulate dynamic pattern
+        }
         // Find best match
         let bestMatch = { name: 'Unknown Food', confidence: 0.3 };
         
