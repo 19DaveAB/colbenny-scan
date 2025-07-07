@@ -3,10 +3,10 @@ class APIClient {
     constructor() {
         // API endpoints and keys
         this.endpoints = {
-            foodAnalysis: 'https://api.logmeal.es/v2/image/foodrecognition',
-            nutritionData: 'https://api.logmeal.es/v2/recognition/dish',
-            foodSearch: 'https://api.logmeal.es/v2/recognition/dish',
-            spoonacular: 'https://api.spoonacular.com'
+            foodAnalysis: 'https://api.logmeal.es/v2/image/recognition/complete',
+            nutritionData: 'https://api.logmeal.es/v2/recognition/nutrition',
+            foodSearch: 'https://api.logmeal.es/v2/recipe/foodsearch',
+            spoonacular: 'https://api.spoonacular.com/food/images/analyze'
         };
 
         // Get API keys from environment or use fallbacks
