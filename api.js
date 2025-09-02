@@ -11,8 +11,8 @@ class APIClient {
 
         // Get API keys from environment or use fallbacks
         this.apiKeys = {
-            logmeal: this.getEnvVar('8d04b28e6c63af380c99c6303fe80c550097defa'),
-            spoonacular: this.getEnvVar('067692799f01441ca56a8de004ee3a6c'),
+    logmeal: this.getEnvVar('LOGMEAL_API_KEY', '8d04b28e6c63af380c99c6303fe80c550097defa'),
+    spoonacular: this.getEnvVar('SPOONACULAR_API_KEY', '067692799f01441ca56a8de004ee3a6c'),
             // If you use USDA/FoodData, add: foodData: this.getEnvVar('YOUR_USDA_API_KEY')
         };
 
